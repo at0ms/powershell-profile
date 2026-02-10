@@ -12,7 +12,7 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 ### Manual Installation
 1. Download or clone this repository.
 2. Create a folder named WindowsPowerShell in your user Documents directory (if it doesn’t already exist).
-3. Copy `Microsoft.PowerShell_profile.ps1` from the repo into that folder.
+3. Copy `Microsoft.PowerShell_profile.ps1` from the `profile` folder into that directory.
 4. Open a new PowerShell session to load the profile.
 5. Verify that the profile loaded by running `psi` and pressing Enter.
 6. Profit.
