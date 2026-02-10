@@ -77,7 +77,7 @@ function Create-Profile {
             $profilePath = Get-ProfileDir
 
             if (!(Test-Path -Path $profilePath)) {
-                New-Item -Path $profilePath -ItemType "directory" -Force
+                New-Item -Path $profilePath -ItemType "directory" -Force | Out-Null
             }
 
             Invoke-RestMethod https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
@@ -214,7 +214,7 @@ function Start-Main-Menu {
         "Exit"
     )
 
-    $choice = Draw-Menu -Title "Main Menu" -Options $mainMenuItems
+    $choice = Draw-Menu -Title "Powershell Profile Setup Script" -Options $mainMenuItems
 
     switch ($choice) {
         1 {
@@ -245,18 +245,15 @@ function Start-Main-Menu {
 #==================================================================================================
 Clear-Host
 
+# Ensure the script can run with elevated privileges
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Warning "Please run this script as an Administrator!"
+    break
+}
+
 # Check for internet connectivity before proceeding
 if (-not (Test-InternetConnection)) {
     break
 }
 
-# Check if user wanted to start the script
-Write-BoxHeader -Title "Powershell Profile Setup Script"
-
-if (-not (Ask-YesNo "Continue with setup?")) {
-    Write-Host "`nSetup cancelled." -ForegroundColor Red
-    exit
-}
-
-# If the user says 'yes' continue to draw the ui
 Start-Main-Menu

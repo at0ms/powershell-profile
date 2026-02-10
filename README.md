@@ -1,12 +1,28 @@
 # Andy's Powershell Profile
 A lightweight PowerShell profile emphasizing readability, streamlined workflow, and distraction‑free use. 
 
-## Preview
-<p align="center">
- <img src="https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/assets/preview1.png" width="700" height="700">
-<p>
+## Previews
+<details>
+  <summary>Profile</summary>
+  <br>
+  <p align="center">
+  <img src="https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/assets/profile_preview1.png" width="700" height="700">
+  <p>
+</details>
+<details>
+  <summary>Setup Script</summary>
+  <br>
+  <p align="center">
+  <img src="https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/assets/setup_script_preview1.png" width="700" height="700">
+  <p>
+</details>
 
 ## Installation
+
+### Interactive Setup (Elevated PowerShell Required)
+```
+irm "https://github.com/at0ms/powershell-profile/raw/main/scripts/setup.ps1" | iex
+```
 
 ### Manual Installation
 1. Download or clone this repository.
