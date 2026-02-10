@@ -1,8 +1,9 @@
 ﻿### Powershell Profile
-### Version: 1.0.1
+### Version: 1.0.2
 
 # Global Variables
-$Global:VersionStr = "1.0.1"
+$Global:VersionStr = "1.0.2"
+$Global:SessionInitMessage = $false # (disabled by default).
 
 # Clear Console
 Clear-Host
@@ -18,7 +19,7 @@ $PSDefaultParameterValues['*:Encoding'] = 'utf8'
 
 #region Utility Functions
 # Helper function for cross-edition compatibility
-function Get-ProfileDir { # Credit: github.com/ChrisTitusTech
+function Get-ProfileDir { # Credit: github.com/ChrisTitusTech/powershell-profile/
     if ($PSVersionTable.PSEdition -eq "Core") {
         return [Environment]::GetFolderPath("MyDocuments") + "\PowerShell"
     } elseif ($PSVersionTable.PSEdition -eq "Desktop") {
@@ -29,7 +30,7 @@ function Get-ProfileDir { # Credit: github.com/ChrisTitusTech
     }
 }
 
-function Set-PSReadLineOptionsCompat { # Credit: github.com/ChrisTitusTech
+function Set-PSReadLineOptionsCompat { # Credit: github.com/ChrisTitusTech/powershell-profile/
     param([hashtable]$Options)
     if ($PSVersionTable.PSEdition -eq "Core") {
         Set-PSReadLineOption @Options
@@ -43,9 +44,16 @@ function Set-PSReadLineOptionsCompat { # Credit: github.com/ChrisTitusTech
 }
 #endregion
 
+# Presents a message on session initialization for users seeking a less minimal interface (disabled by default).
+if ($Global:SessionInitMessage) {
+    Write-Host "Andy's Powershell Profile" -ForegroundColor "Blue"
+    Write-Host "Use '" -NoNewLine; Write-Host "psh" -ForegroundColor "Blue" -NoNewLine; Write-Host "' to display help information.";
+    Write-Host " " # Empty Line
+}
+
 # Check and Run Oh-My-Posh
 if (Get-Command "oh-my-posh" -errorAction SilentlyContinue) {
-    $localThemePath = Join-Path (Get-ProfileDir) "npp.omp.json"
+    $localThemePath = Join-Path (Get-ProfileDir) "theme.omp.json"
 
     if (-not (Test-Path $localThemePath)) {
         # Try to download the theme file to the detected local path.
@@ -69,7 +77,7 @@ if (Get-Command "oh-my-posh" -errorAction SilentlyContinue) {
 }
 
 #region Modify PSReadLine
-$PSReadLineOptions = @{ # Credit: github.com/ChrisTitusTech
+$PSReadLineOptions = @{ # Credit: github.com/ChrisTitusTech/powershell-profile/
     EditMode = 'Windows'
     HistoryNoDuplicates = $true
     HistorySearchCursorMovesToEnd = $true
@@ -92,7 +100,7 @@ $PSReadLineOptions = @{ # Credit: github.com/ChrisTitusTech
 Set-PSReadLineOptionsCompat -Options $PSReadLineOptions
 
 # Remove sensitive information from command history
-Set-PSReadLineOption -AddToHistoryHandler { # Credit: github.com/ChrisTitusTech
+Set-PSReadLineOption -AddToHistoryHandler { # Credit: github.com/ChrisTitusTech/powershell-profile/
     param($line)
     $sensitive = @('password', 'secret', 'token', 'apikey', 'connectionstring')
     $hasSensitive = $sensitive | Where-Object { $line -match $_ }
@@ -109,7 +117,7 @@ function Show-Help {
     Write-Host "└──────────────────────────────────────────────────────┘"
     Write-Host " " # Empty Line
 
-    # Information
+    # General
     Write-Host "   ┌────────────────────────────────────────────────┐"
     Write-Host "   │                     General                    │"
     Write-Host "   └────────────────────────────────────────────────┘"
@@ -164,6 +172,6 @@ function Show-Information {
 }
 #endregion
 
-# Set our alias Names
+# Define custom command aliases
 Set-Alias -Name psh -Value Show-Help
 Set-Alias -Name psi -Value Show-Information
