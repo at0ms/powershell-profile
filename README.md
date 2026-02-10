@@ -36,6 +36,10 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 ## Release Notes
 See [Release Notes](release-notes.md).
 
+## Credits
+* Chris Titus Tech
+* DreamTimeZ
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first
 to discuss what you would like to change.

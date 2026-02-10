@@ -1,7 +1,11 @@
 # PowerShell Profile Release Notes
 
+### 1.0.3 - February 10, 2026
+* Added command caching. Credit to DreamTimeZ's Powershell profile
+* Refacted code and comments
+
 ### 1.0.2 - February 10, 2026
-* Added a optional message when a new Powershell session is started (disabled by default)
+* Added an optional message when a new PowerShell session is started (disabled by default)
 * Refacted some of the code.
 
 ### 1.0.1 - February 10, 2026
