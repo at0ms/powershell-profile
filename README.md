@@ -19,7 +19,7 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 
 ## Installation
 
-### Interactive Setup (Elevated PowerShell Required)
+### Interactive Setup (Recommended)
 ```
 irm "https://github.com/at0ms/powershell-profile/raw/main/scripts/setup.ps1" | iex
 ```

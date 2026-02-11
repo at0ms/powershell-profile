@@ -15,7 +15,7 @@ $Commands = @{
 #==================================================================================================
 # Utility Functions
 #==================================================================================================
-function Write-BoxHeader {
+function Write-Header {
     param(
         [string]$Title,
         [string]$TextColour = "Blue",
@@ -70,7 +70,7 @@ function Get-ProfileDir {
 #==================================================================================================
 function Create-Profile {
     Clear-Host
-    Write-BoxHeader "Creating Profile"
+    Write-Header "Creating Profile"
 
     if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         try {
@@ -106,7 +106,7 @@ function Create-Profile {
 
 function Remove-Profile {
     Clear-Host
-    Write-BoxHeader "Removing Profile"
+    Write-Header "Removing Profile"
 
     if ((Test-Path -Path $PROFILE -PathType Leaf))
     {
@@ -128,7 +128,7 @@ function Remove-Profile {
 #==================================================================================================
 function Install-Extras {
     Clear-Host
-    Write-BoxHeader "Installing Extras"
+    Write-Header "Installing Extras"
 
     if(!$Commands.OhMyPosh) {
         try {
@@ -145,7 +145,7 @@ function Install-Extras {
 
 function Remove-Extras {
     Clear-Host
-    Write-BoxHeader "Removing Extras"
+    Write-Header "Removing Extras"
 
     if($Commands.OhMyPosh) {
         try {
@@ -187,7 +187,7 @@ function Draw-Menu {
         [string[]]$Options
     )
 
-    Write-BoxHeader $Title
+    Write-Header $Title
 
     for ($i = 0; $i -lt $Options.Count; $i++) {
         Write-Host ("[$($i+1)]  " + $Options[$i]) -ForegroundColor Gray
@@ -241,15 +241,9 @@ function Start-Main-Menu {
 }
 
 #==================================================================================================
-# Session Initialization
+# Initialization
 #==================================================================================================
 Clear-Host
-
-# Ensure the script can run with elevated privileges
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "Please run this script as an Administrator!"
-    break
-}
 
 # Check for internet connectivity before proceeding
 if (-not (Test-InternetConnection)) {

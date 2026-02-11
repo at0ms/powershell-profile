@@ -1,14 +1,17 @@
 ﻿#==================================================================================================
 # Powershell Profile
 #==================================================================================================
-# Version: 1.0.3
+# Version: 1.0.4
 #==================================================================================================
 
 #==================================================================================================
 # Global Variables
 #==================================================================================================
-$Global:VersionStr = "1.0.3"
+$Global:VersionStr = "1.0.4"
 $Global:SessionInitMessage = $false # (disabled by default).
+$Global:HeaderWidth = 50
+$Global:SectionPadding = 2
+$Global:SectionOptionPadding = 2
 
 #==================================================================================================
 # Command Cache
@@ -23,6 +26,78 @@ $Commands = @{
 #==================================================================================================
 # Utility Functions
 #==================================================================================================
+function Write-EmptyLine {
+    Write-Host " "
+}
+
+function Write-Header {
+    param(
+        [string]$Title,
+        [string]$TextColour = "Blue",
+        [int]$Width = 50
+    )
+
+    # Calculate padding
+    $paddingTotal = $Width - $Title.Length
+    if ($paddingTotal -lt 0) { $paddingTotal = 0 }
+
+    $padLeft  = [math]::Floor($paddingTotal / 2)
+    $padRight = $paddingTotal - $padLeft
+
+    # Build lines
+    $lineTop    = "┌" + ("─" * $Width) + "┐"
+    $lineBottom = "└" + ("─" * $Width) + "┘"
+    $leftPad    = "│" + (" " * $padLeft)
+    $rightPad   = (" " * $padRight) + "│"
+
+    # Output
+    Write-Host $lineTop
+    Write-Host $leftPad -NoNewLine
+    Write-Host $Title -ForegroundColor $TextColour -NoNewLine
+    Write-Host $rightPad
+    Write-Host $lineBottom
+    
+    Write-EmptyLine
+}
+
+function Write-Section {
+    param(
+        [string]$Title,
+        [string]$TextColour = "Gray",
+        [int]$Width = 40,
+        [int]$LeftPadding = 2
+    )
+
+    # Build padding
+    $pad = " " * $LeftPadding
+
+    # Write title
+    Write-Host ($pad + $Title) -ForegroundColor $TextColour
+
+    # Write line
+    Write-Host ($pad + ("─" * $Width))
+
+    Write-EmptyLine
+}
+
+function Write-SectionOption {
+    param(
+        [string]$Text,
+        [string]$TextColour = "Gray",
+        [int]$LeftPadding = 2,
+        [bool]$SameLine = $false
+    )
+
+    # Build padding
+    $pad = " " * $LeftPadding
+
+    # Write text
+    if ($SameLine) {
+        Write-Host ($pad + $Text) -ForegroundColor $TextColour -NoNewLine
+    } else {
+        Write-Host ($pad + $Text) -ForegroundColor $TextColour
+    }
+}
 
 # Helper function for cross-edition compatibility
 function Get-ProfileDir {
@@ -55,40 +130,27 @@ function Set-PSReadLineOptionsCompat {
 #==================================================================================================
 function Show-Help {
     # Header
-    Write-Host " " # Empty Line
-    Write-Host "┌──────────────────────────────────────────────────────┐"
-    Write-Host "│" -NoNewLine; Write-Host "                         Help                         " -ForegroundColor "Blue" -NoNewLine; Write-Host "│"
-    Write-Host "└──────────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-Header "Help" -Width $Global:HeaderWidth
 
     # General
-    Write-Host "   ┌────────────────────────────────────────────────┐"
-    Write-Host "   │                     General                    │"
-    Write-Host "   └────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-Section "General" -Width ($Global:HeaderWidth - ($Global:SectionPadding * 2) + 2) -LeftPadding $Global:SectionPadding
 
-    Write-Host "  psh" -ForegroundColor "Green" -NoNewLine; Write-Host " - Shows this help message."
-    Write-Host "  psi" -ForegroundColor "Green" -NoNewLine; Write-Host " - Shows infomation about the script."
-    Write-Host " " # Empty Line
+    Write-SectionOption "psh" -LeftPadding $Global:SectionOptionPadding -SameLine $true -TextColour "Green"; Write-Host " - Shows this help message."
+    Write-SectionOption "psi" -LeftPadding $Global:SectionOptionPadding -SameLine $true -TextColour "Green"; Write-Host " - Shows infomation about the script."
+    Write-EmptyLine
 
     # Information
-    Write-Host "   ┌────────────────────────────────────────────────┐"
-    Write-Host "   │                   Information                  │"
-    Write-Host "   └────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-Section "Information" -Width ($Global:HeaderWidth - ($Global:SectionPadding * 2) + 2) -LeftPadding $Global:SectionPadding
 
     if ($Commands.OhMyPosh) {
-        Write-Host "  oh-my-posh: " -NoNewLine; Write-Host "Installed" -ForegroundColor "Green"
+        Write-SectionOption "oh-my-posh: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host "Installed" -ForegroundColor "Green"
     } else {
-        Write-Host "  oh-my-posh: " -NoNewLine; Write-Host "Not Installed" -ForegroundColor "Red"
+        Write-SectionOption "oh-my-posh: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host "Not Installed" -ForegroundColor "Red";
     }
 
     # Footer
-    Write-Host " " # Empty Line
-    Write-Host "┌──────────────────────────────────────────────────────┐"
-    Write-Host "│" -NoNewLine; Write-Host "                                                      " -ForegroundColor "Blue" -NoNewLine; Write-Host "│"
-    Write-Host "└──────────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-EmptyLine
+    Write-Header "" -Width $Global:HeaderWidth
 }
 
 #==================================================================================================
@@ -96,24 +158,20 @@ function Show-Help {
 #==================================================================================================
 function Show-Information {
     # Header
-    Write-Host " " # Empty Line
-    Write-Host "┌──────────────────────────────────────────────────────┐"
-    Write-Host "│" -NoNewLine; Write-Host "                     Information                      " -ForegroundColor "Blue" -NoNewLine; Write-Host "│"
-    Write-Host "└──────────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-Header "Information" -Width $Global:HeaderWidth
     
-    Write-Host "  Version: " -NoNewLine; Write-Host $Global:VersionStr -ForegroundColor "Blue"
-    Write-Host "  Developer: " -NoNewLine; Write-Host "Andy" -ForegroundColor "Blue"
-    Write-Host " " # Empty Line
-    Write-Host "  Github: " -NoNewLine; Write-Host "https://github.com/at0ms/powershell-profile" -ForegroundColor "Blue"
-    Write-Host "  Release Notes: " -NoNewLine; Write-Host "https://github.com/at0ms/powershell-profile/blob/main/release-notes.md" -ForegroundColor "Blue"
+    # Information
+    Write-SectionOption "Version: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host $Global:VersionStr -ForegroundColor "Blue"
+    Write-SectionOption "Developer: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host "Andy" -ForegroundColor "Blue"
+    
+    Write-EmptyLine
+
+    Write-SectionOption "Github: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host "https://github.com/at0ms/powershell-profile" -ForegroundColor "Blue"
+    Write-SectionOption "Release Notes: " -LeftPadding $Global:SectionOptionPadding -SameLine $true; Write-Host "https://github.com/at0ms/powershell-profile/blob/main/release-notes.md" -ForegroundColor "Blue"
 
     # Footer
-    Write-Host " " # Empty Line
-    Write-Host "┌──────────────────────────────────────────────────────┐"
-    Write-Host "│" -NoNewLine; Write-Host "                                                      " -ForegroundColor "Blue" -NoNewLine; Write-Host "│"
-    Write-Host "└──────────────────────────────────────────────────────┘"
-    Write-Host " " # Empty Line
+    Write-EmptyLine
+    Write-Header "" -Width $Global:HeaderWidth
 }
 
 #==================================================================================================
@@ -140,7 +198,7 @@ $PSDefaultParameterValues['*:Encoding'] = 'utf8'
 if ($Global:SessionInitMessage) {
     Write-Host "Andy's Powershell Profile" -ForegroundColor "Blue"
     Write-Host "Use '" -NoNewLine; Write-Host "psh" -ForegroundColor "Blue" -NoNewLine; Write-Host "' to display help information.";
-    Write-Host " " # Empty Line
+    Write-EmptyLine
 }
 
 # Validate Oh My Posh Installation and Load Theme
@@ -149,8 +207,9 @@ if($Commands.OhMyPosh)
     $localThemePath = Join-Path (Get-ProfileDir) "theme.omp.json"
 
     if (-not (Test-Path $localThemePath)) {
-        # Try to download the theme file to the detected local path.
         Write-Warning "Oh My Posh theme not found!, attempting to download."
+
+        # Try to download the theme file to the detected local path.
         $themeUrl = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json"
 
         try {

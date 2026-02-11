@@ -1,5 +1,9 @@
 # PowerShell Profile Release Notes
 
+### 1.0.4 - February 11, 2026
+* Show-Host & Show-Information now uses these helper functions `Write-EmptyLine`, `Write-Header`, `Write-Section` and `Write-SectionOption`.
+* Refacted code and comments
+
 ### 1.0.3 - February 10, 2026
 * Added command caching. Credit to DreamTimeZ's Powershell profile
 * Refacted code and comments
