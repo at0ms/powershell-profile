@@ -45,3 +45,28 @@ function Get-ProfileDir {
         return $null
     }
 }
+
+#==================================================================================================
+# Script Variables
+#==================================================================================================
+$Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
+$Script:ConfigFilePath = Join-Path $Script:BasePath "Config.json"
+$Script:Config = {}
+
+#==================================================================================================
+# Pre-Initialization
+#==================================================================================================
+if (-not (Test-Path $Script:BasePath)) {
+    New-Item -ItemType Directory -Path $Script:BasePath | Out-Null
+}
+
+$Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
+    ClearConsoleOnInitialization = $true
+}
+
+#==================================================================================================
+# Initialization
+#==================================================================================================
+if($Script:Config.ClearConsoleOnInitialization) {
+    Clear-Host
+}
