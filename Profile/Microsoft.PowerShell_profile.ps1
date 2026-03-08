@@ -47,6 +47,14 @@ function Get-ProfileDir {
 }
 
 #==================================================================================================
+# Command Cache
+#==================================================================================================
+$availableCommands = (Get-Command oh-my-posh -CommandType Application -ErrorAction Ignore).Name -replace '\.exe$', ''
+$Commands = @{
+    OhMyPosh = 'oh-my-posh' -in $availableCommands
+}
+
+#==================================================================================================
 # Script Variables
 #==================================================================================================
 $Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
