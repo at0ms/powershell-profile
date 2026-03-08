@@ -62,6 +62,7 @@ if (-not (Test-Path $Script:BasePath)) {
 
 $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
     ClearConsoleOnInitialization = $true
+    ConsoleUseUTF8 = $true
 }
 
 #==================================================================================================
@@ -69,4 +70,16 @@ $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
 #==================================================================================================
 if($Script:Config.ClearConsoleOnInitialization) {
     Clear-Host
+}
+
+if($Script:Config.ConsoleUseUTF8)
+{
+    # Ensure the console uses UTF‑8
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+    # Ensure PowerShell uses UTF‑8 for external commands and pipelines.
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+
+    # Make UTF‑8 the default for Out-File, Export-CSV, etc.
+    $PSDefaultParameterValues['*:Encoding'] = 'utf8'
 }
