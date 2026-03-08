@@ -34,3 +34,14 @@ function Load-JsonConfig {
     $raw = Get-Content -Path $Path -Raw
     return ($raw | ConvertFrom-Json)
 }
+
+function Get-ProfileDir {
+    if ($PSVersionTable.PSEdition -eq "Core") {
+        return [Environment]::GetFolderPath("MyDocuments") + "\PowerShell"
+    } elseif ($PSVersionTable.PSEdition -eq "Desktop") {
+        return [Environment]::GetFolderPath("MyDocuments") + "\WindowsPowerShell"
+    } else {
+        Write-Error "Unsupported PowerShell edition: $($PSVersionTable.PSEdition)"
+        return $null
+    }
+}
