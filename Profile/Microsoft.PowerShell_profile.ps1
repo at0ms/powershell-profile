@@ -71,6 +71,9 @@ if (-not (Test-Path $Script:BasePath)) {
 $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
     ClearConsoleOnInitialization = $true
     ConsoleUseUTF8 = $true
+    Customization = @{
+        OhMyPosh = $true
+    }
 }
 
 #==================================================================================================
@@ -90,4 +93,31 @@ if($Script:Config.ConsoleUseUTF8)
 
     # Make UTF‑8 the default for Out-File, Export-CSV, etc.
     $PSDefaultParameterValues['*:Encoding'] = 'utf8'
+}
+
+if($Script:Config.Customization.OhMyPosh)
+{
+    if($Commands.OhMyPosh)
+    {
+        $localThemePath = Join-Path $Script:BasePath "theme.omp.json"
+
+        if (-not (Test-Path $localThemePath))
+        {
+            Write-Warning "Oh My Posh theme not found!, attempting to download."
+            $themeUrl = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json"
+
+            try {
+                Invoke-RestMethod -Uri $themeUrl -OutFile $localThemePath
+                Write-Host "Downloaded missing Oh My Posh theme to $localThemePath"
+            } catch {
+                Write-Warning "Failed to download theme file. Falling back to remote theme. Error: $_"
+            }
+        }
+
+        if (Test-Path $localThemePath) {
+            oh-my-posh init pwsh --config $localThemePath | Invoke-Expression
+        } else {
+            oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
+        }
+    }
 }
