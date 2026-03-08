@@ -47,6 +47,13 @@ function Get-ProfileDir {
 }
 
 #==================================================================================================
+# Script Variables
+#==================================================================================================
+$Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
+$Script:ConfigFilePath = Join-Path $Script:BasePath "Config.json"
+$Script:Config = {}
+
+#==================================================================================================
 # Command Cache
 #==================================================================================================
 $availableCommands = (Get-Command oh-my-posh -CommandType Application -ErrorAction Ignore).Name -replace '\.exe$', ''
@@ -55,11 +62,11 @@ $Commands = @{
 }
 
 #==================================================================================================
-# Script Variables
+# Shortcuts
 #==================================================================================================
-$Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
-$Script:ConfigFilePath = Join-Path $Script:BasePath "Config.json"
-$Script:Config = {}
+if($Commands.OhMyPosh) {
+    Set-Alias -Name omp -Value oh-my-posh
+}
 
 #==================================================================================================
 # Pre-Initialization
