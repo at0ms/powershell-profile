@@ -215,7 +215,7 @@ function Start-Main-Menu {
         }
         5 {
             Write-Host "`nExiting installer." -ForegroundColor Red
-            exit
+            break
         }
     }
 }

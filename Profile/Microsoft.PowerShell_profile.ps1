@@ -71,6 +71,48 @@ if($Commands.OhMyPosh) {
 }
 
 #==================================================================================================
+# CLI
+#==================================================================================================
+function Invoke-ProfileCLI
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    if (-not $Args -or $Args.Count -eq 0) {
+        Write-Host " "
+        Write-Host "Profile CLI"
+        Write-Host " "
+        Write-Host "Usage:"
+        Write-Host "  profile setup"
+        Write-Host " "
+        return
+    }
+
+    $command = $Args[0].ToLower()
+    $rest    = $Args[1..($Args.Count - 1)]
+
+    switch ($command)
+    {
+        "setup" {
+            if(Test-GitHubConnection) {
+                irm "https://github.com/at0ms/powershell-profile/raw/main/Scripts/setup.ps1" | iex
+            } else {
+                Write-Warning "Cannot connect to github.com. Please check your connection."
+            }
+        }
+
+        default {
+            throw "Unknown profile command: $command"
+        }
+    }
+}
+
+Set-Alias -Name profile -Value Invoke-ProfileCLI
+
+#==================================================================================================
 # Pre-Initialization
 #==================================================================================================
 if (-not (Test-Path $Script:BasePath)) {
