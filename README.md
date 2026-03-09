@@ -4,6 +4,7 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 ## Table of contents
 - [Features](#Features)
 - [Installation](#Installation)
+    - [Interactive Setup (Recommended)](#Interactive-Setup-(Recommended))
     - [Manual Installation](#Manual-Installation)
 - [Changes](#Changes)
 - [Credits](#Credits)
@@ -18,6 +19,11 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 > More features are on the way. Feel free to jump in and contribute.
 
 ## Installation
+
+### Interactive Setup (Recommended)
+```powershell
+irm "https://github.com/at0ms/powershell-profile/raw/main/scripts/setup.ps1" | iex
+```
 
 ### Manual Installation
 1. Download or clone this repository.
