@@ -71,7 +71,7 @@ function Create-Profile {
                 New-Item -Path $profilePath -ItemType "directory" -Force | Out-Null
             }
 
-            Invoke-RestMethod https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
+            Invoke-RestMethod https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/Profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
             Write-Host "Profile has been created." -ForegroundColor "Green"
             Write-Host "Please restart your PowerShell session to apply changes."
         }
@@ -85,7 +85,7 @@ function Create-Profile {
             $backupPath = Join-Path (Split-Path $PROFILE) "old_powershell_profile.ps1"
             Move-Item -Path $PROFILE -Destination $backupPath -Force
             
-            Invoke-RestMethod https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
+            Invoke-RestMethod https://raw.githubusercontent.com/at0ms/powershell-profile/refs/heads/main/Profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
 
             Write-Host "Profile has been Updated." -ForegroundColor "Green"
             Write-Host "Please restart your PowerShell session to apply changes."

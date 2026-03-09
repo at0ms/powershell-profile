@@ -22,7 +22,7 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 
 ### Interactive Setup (Recommended)
 ```powershell
-irm "https://github.com/at0ms/powershell-profile/raw/main/scripts/setup.ps1" | iex
+irm "https://github.com/at0ms/powershell-profile/raw/main/Scripts/setup.ps1" | iex
 ```
 
 ### Manual Installation
