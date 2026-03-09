@@ -37,6 +37,18 @@ function Load-JsonConfig {
     return ($raw | ConvertFrom-Json)
 }
 
+function Test-GitHubConnection {
+    if ($PSVersionTable.PSEdition -eq "Core") {
+        # If PowerShell Core, use a 1 second timeout.
+        return Test-Connection github.com -Count 1 -Quiet -TimeoutSeconds 1
+    } else {
+        # For PowerShell Desktop, use .NET Ping class with timeout.
+        $ping = New-Object System.Net.NetworkInformation.Ping
+        $result = $ping.Send("github.com", 1000) # 1 second timeout.
+        return ($result.Status -eq "Success")
+    }
+}
+
 function Get-ProfileDir {
     if ($PSVersionTable.PSEdition -eq "Core") {
         return [Environment]::GetFolderPath("MyDocuments") + "\PowerShell"
