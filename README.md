@@ -24,6 +24,7 @@ A lightweight PowerShell profile emphasizing readability, streamlined workflow, 
 ```powershell
 irm "https://github.com/at0ms/powershell-profile/raw/main/Scripts/setup.ps1" | iex
 ```
+> It's recommended to run this in an elevated shell.
 
 ### Manual Installation
 1. Download or clone this repository.
