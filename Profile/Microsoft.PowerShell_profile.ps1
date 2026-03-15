@@ -72,9 +72,12 @@ $Script:AliasRegistry = @{}
 #==================================================================================================
 # Command Cache
 #==================================================================================================
-$availableCommands = (Get-Command oh-my-posh -CommandType Application -ErrorAction Ignore).Name -replace '\.exe$', ''
+$availableCommands = (Get-Command oh-my-posh, subl, code, codium -CommandType Application -ErrorAction Ignore).Name -replace '\.exe$', ''
 $Commands = @{
     OhMyPosh = 'oh-my-posh' -in $availableCommands
+    SublimeText = 'subl' -in $availableCommands
+    VSCode = 'code' -in $availableCommands
+    VSCodium = 'codium' -in $availableCommands
 }
 
 #==================================================================================================
@@ -250,6 +253,17 @@ Register-Command -Name "greet" -Action {
     param($name)
     "Hello, $name"
 } -NativeAlias "greet" -Category "Utility" -Description "Greets a user by name."
+
+Register-Command -Name "edit-file" -Action {
+    param($fileName)
+
+    $editor = if ($Commands.SublimeText) { 'subl' } # Sublime Text
+    elseif ($Commands.VSCode) { 'code' } # VSCode
+    elseif ($Commands.VSCodium) { 'codium' } # VSCodium
+    else { "notepad" } # Default on windows
+
+    & $editor $fileName
+} -NativeAlias "edit" -Category "Utility" -Description "Opens file in editor."
 
 #==================================================================================================
 # Pre-Initialization
