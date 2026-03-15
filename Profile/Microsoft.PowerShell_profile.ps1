@@ -1,7 +1,7 @@
 #==================================================================================================
 # Andy's Powershell Profile
 #==================================================================================================
-# Version: 1.0.0
+# Version: 1.0.1
 #==================================================================================================
 
 #==================================================================================================
@@ -101,13 +101,18 @@ function Invoke-ProfileCLI
         Write-Host " "
         Write-Host "Usage:"
         Write-Host "  profile setup"
+        Write-Host "  profile invoke <command>"
         Write-Host "  profile get-commands"
         Write-Host " "
         return
     }
 
     $command = $Args[0].ToLower()
-    $rest    = $Args[1..($Args.Count - 1)]
+    if ($Args.Count -gt 1) {
+        $rest = @($Args[1..($Args.Count - 1)])
+    } else {
+        $rest = @()
+    }
 
     switch ($command)
     {
@@ -117,6 +122,15 @@ function Invoke-ProfileCLI
             } else {
                 Write-Warning "Cannot connect to github.com. Please check your connection."
             }
+        }
+
+        "invoke" {
+            if ($rest.Count -lt 1) {
+                Write-Host "Usage: profile invoke <command>" -ForegroundColor Red
+                break
+            }
+            
+            Invoke-CommandByName -Name @rest
         }
 
         "get-commands" {
