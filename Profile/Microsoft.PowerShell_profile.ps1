@@ -66,6 +66,8 @@ function Get-ProfileDir {
 $Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
 $Script:ConfigFilePath = Join-Path $Script:BasePath "Config.json"
 $Script:Config = {}
+$Script:CommandRegistry = @{}
+$Script:AliasRegistry = @{}
 
 #==================================================================================================
 # Command Cache
@@ -99,6 +101,7 @@ function Invoke-ProfileCLI
         Write-Host " "
         Write-Host "Usage:"
         Write-Host "  profile setup"
+        Write-Host "  profile get-commands"
         Write-Host " "
         return
     }
@@ -116,6 +119,10 @@ function Invoke-ProfileCLI
             }
         }
 
+        "get-commands" {
+            Invoke-GetCommands
+        }
+
         default {
             throw "Unknown profile command: $command"
         }
@@ -123,6 +130,112 @@ function Invoke-ProfileCLI
 }
 
 Set-Alias -Name profile -Value Invoke-ProfileCLI
+
+#==================================================================================================
+# Command System
+#==================================================================================================
+function Register-Command {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Action,
+
+        [string[]]$Alias,
+        [string[]]$NativeAlias,
+
+        [string]$Category,
+        [string]$Description
+    )
+
+    # Store command metadata.
+    $Script:CommandRegistry[$Name] = [pscustomobject]@{
+        Action      = $Action
+        Description = $Description
+        Category    = $Category
+    }
+
+    # Internal aliases.
+    if ($Alias) {
+        foreach ($a in $Alias) {
+            $Script:AliasRegistry[$a] = $Name
+        }
+    }
+
+    # Native aliases -> wrapper functions.
+    if ($NativeAlias)
+    {
+        foreach ($na in $NativeAlias)
+        {
+            $func = @"
+param([Parameter(ValueFromRemainingArguments)]`$args)
+Invoke-CommandByName '$Name' @args
+"@
+
+            Set-Item -Path "Function:\Global:$na" -Value ([scriptblock]::Create($func))
+
+            $Script:AliasRegistry[$na] = $Name
+        }
+    }
+}
+
+function Invoke-CommandByName {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(ValueFromRemainingArguments)]
+        $Args
+    )
+
+    # Resolve alias -> command.
+    if ($Global:AliasRegistry.ContainsKey($Name)) {
+        $Name = $Global:AliasRegistry[$Name]
+    }
+
+    if (-not $Global:CommandRegistry.ContainsKey($Name)) {
+        throw "Command '$Name' not found."
+    }
+
+    $cmd = $Global:CommandRegistry[$Name]
+    & $cmd.Action @Args
+}
+
+function Invoke-GetCommands {
+    $results = foreach ($name in $Global:CommandRegistry.Keys) {
+        $entry = $Global:CommandRegistry[$name]
+
+        $aliases = $Global:AliasRegistry.GetEnumerator() |
+                   Where-Object { $_.Value -eq $name } |
+                   Select-Object -ExpandProperty Key
+
+        # Split subcommands for grouping.
+        $parts = $name -split ' '
+        $main  = $parts[0]
+        $sub   = if ($parts.Count -gt 1) { ($parts[1..($parts.Count-1)] -join ' ') } else { "" }
+
+        [pscustomobject]@{
+            Main        = $main
+            Subcommand  = $sub
+            Aliases     = if ($aliases) { $aliases -join ", " } else { "" }
+            Category    = $entry.Category
+            Description = $entry.Description
+        }
+    }
+
+    $results |
+        Sort-Object Main, Subcommand |
+        Format-Table -AutoSize
+}
+
+#==================================================================================================
+# Commands
+#==================================================================================================
+Register-Command -Name "greet" -Action {
+    param($name)
+    "Hello, $name"
+} -NativeAlias "greet" -Category "Utility" -Description "Greets a user by name."
 
 #==================================================================================================
 # Pre-Initialization
