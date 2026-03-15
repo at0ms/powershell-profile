@@ -64,7 +64,7 @@ function Get-ProfileDir {
 # Script Variables
 #==================================================================================================
 $Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
-$Script:ConfigFilePath = Join-Path $Script:BasePath "Config.json"
+$Script:ConfigFilePath = Join-Path $Script:BasePath "config.json"
 $Script:Config = {}
 $Script:CommandRegistry = @{}
 $Script:AliasRegistry = @{}
@@ -106,6 +106,8 @@ function Invoke-ProfileCLI
         Write-Host "  profile setup"
         Write-Host "  profile invoke <command>"
         Write-Host "  profile get-commands"
+        Write-Host "  profile config-edit"
+        Write-Host "  profile config-reload"
         Write-Host " "
         return
     }
@@ -138,6 +140,15 @@ function Invoke-ProfileCLI
 
         "get-commands" {
             Invoke-GetCommands
+        }
+
+        "config-edit" {
+            Invoke-CommandByName edit $Script:ConfigFilePath
+        }
+
+        "config-reload" {
+            $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath
+            Write-Host "Reloaded config file." -ForegroundColor Green
         }
 
         default {
@@ -257,11 +268,15 @@ Register-Command -Name "greet" -Action {
 Register-Command -Name "edit-file" -Action {
     param($fileName)
 
-    $editor = if ($Commands.SublimeText) { 'subl' } # Sublime Text
-    elseif ($Commands.VSCode) { 'code' } # VSCode
-    elseif ($Commands.VSCodium) { 'codium' } # VSCodium
-    else { "notepad" } # Default on windows
-
+    if($Script:Config.EditorOverride) {
+        $editor = $Script:Config.Editor
+    } else {
+        $editor = if ($Commands.SublimeText) { 'subl' } # Sublime Text
+        elseif ($Commands.VSCode) { 'code' } # VSCode
+        elseif ($Commands.VSCodium) { 'codium' } # VSCodium
+        else { "notepad" } # Default on windows
+    }
+    
     & $editor $fileName
 } -NativeAlias "edit" -Category "Utility" -Description "Opens file in editor."
 
@@ -275,6 +290,8 @@ if (-not (Test-Path $Script:BasePath)) {
 $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
     ClearConsoleOnInitialization = $true
     ConsoleUseUTF8 = $true
+    Editor = ""
+    EditorOverride = $false
     Customization = @{
         OhMyPosh = $true
     }
