@@ -81,13 +81,6 @@ $Commands = @{
 }
 
 #==================================================================================================
-# Shortcuts
-#==================================================================================================
-if($Commands.OhMyPosh) {
-    Set-Alias -Name omp -Value oh-my-posh
-}
-
-#==================================================================================================
 # CLI
 #==================================================================================================
 function Invoke-ProfileCLI
@@ -260,10 +253,11 @@ function Invoke-GetCommands {
 #==================================================================================================
 # Commands
 #==================================================================================================
-Register-Command -Name "greet" -Action {
-    param($name)
-    "Hello, $name"
-} -NativeAlias "greet" -Category "Utility" -Description "Greets a user by name."
+
+# Shortcuts
+Register-Command -Name "oh-my-posh" -Action {
+    oh-my-posh @Args
+} -NativeAlias "omp" -Category "Shortcuts" -Description "Shortcut for oh-my-posh."
 
 Register-Command -Name "edit-file" -Action {
     param($fileName)
