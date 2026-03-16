@@ -37,6 +37,22 @@ function Load-JsonConfig {
     return ($raw | ConvertFrom-Json)
 }
 
+function Pick-FileEditor {
+    if($Script:Config.EditorOverride) {
+        $Script:Editor = $Script:Config.Editor
+    } else {
+        $Script:Editor = if ($Commands.SublimeText) { 'subl' } # Sublime Text
+        elseif ($Commands.VSCode) { 'code' } # VSCode
+        elseif ($Commands.VSCodium) { 'codium' } # VSCodium
+        else { "notepad" } # Default on windows
+    }
+
+    if (-not [Environment]::GetEnvironmentVariable('EDITOR', 'User')) {
+        # Set a temperary environment value for our editor.
+        $env:EDITOR = $Script:Editor
+    }
+}
+
 function Test-GitHubConnection {
     if ($PSVersionTable.PSEdition -eq "Core") {
         # If PowerShell Core, use a 1 second timeout.
@@ -68,6 +84,7 @@ $Script:ConfigFilePath = Join-Path $Script:BasePath "config.json"
 $Script:Config = {}
 $Script:CommandRegistry = @{}
 $Script:AliasRegistry = @{}
+$Script:Editor = ""
 
 #==================================================================================================
 # Command Cache
@@ -141,6 +158,7 @@ function Invoke-ProfileCLI
 
         "config-reload" {
             $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath
+            Pick-FileEditor
             Write-Host "Reloaded config file." -ForegroundColor Green
         }
 
@@ -261,17 +279,7 @@ Register-Command -Name "oh-my-posh" -Action {
 
 Register-Command -Name "edit-file" -Action {
     param($fileName)
-
-    if($Script:Config.EditorOverride) {
-        $editor = $Script:Config.Editor
-    } else {
-        $editor = if ($Commands.SublimeText) { 'subl' } # Sublime Text
-        elseif ($Commands.VSCode) { 'code' } # VSCode
-        elseif ($Commands.VSCodium) { 'codium' } # VSCodium
-        else { "notepad" } # Default on windows
-    }
-    
-    & $editor $fileName
+    & $Script:Editor $fileName
 } -NativeAlias "edit" -Category "Utility" -Description "Opens file in editor."
 
 #==================================================================================================
@@ -290,6 +298,8 @@ $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
         OhMyPosh = $true
     }
 }
+
+Pick-FileEditor
 
 #==================================================================================================
 # Initialization
