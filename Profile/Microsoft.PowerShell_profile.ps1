@@ -1,7 +1,7 @@
 #==================================================================================================
 # Andy's Powershell Profile
 #==================================================================================================
-# Version: 1.0.1
+# Version: 1.0.2
 #==================================================================================================
 
 #==================================================================================================
@@ -271,7 +271,6 @@ function Invoke-GetCommands {
 #==================================================================================================
 # Commands
 #==================================================================================================
-
 # Shortcuts
 Register-Command -Name "oh-my-posh" -Action {
     oh-my-posh @Args
@@ -281,6 +280,26 @@ Register-Command -Name "edit-file" -Action {
     param($fileName)
     & $Script:Editor $fileName
 } -NativeAlias "edit" -Category "Utility" -Description "Opens file in editor."
+
+#==================================================================================================
+# Argument Completers
+#==================================================================================================
+$scriptblock = {
+    param($wordToComplete, $commandAst, $cursorPosition)
+
+    $customCompletions = @{
+        'profile' = @('setup', 'invoke', 'get-commands', 'config-edit', 'config-reload')
+    }
+
+    $command = $commandAst.CommandElements[0].Value
+    if ($customCompletions.ContainsKey($command)) {
+        $customCompletions[$command] | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+    }
+}
+
+Register-ArgumentCompleter -Native -CommandName profile -ScriptBlock $scriptblock
 
 #==================================================================================================
 # Pre-Initialization
