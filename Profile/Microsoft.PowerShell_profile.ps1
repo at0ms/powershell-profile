@@ -302,6 +302,17 @@ $scriptblock = {
 Register-ArgumentCompleter -Native -CommandName profile -ScriptBlock $scriptblock
 
 #==================================================================================================
+# PSReadLine
+#==================================================================================================
+# Remove sensitive information from command history
+Set-PSReadLineOption -AddToHistoryHandler {
+    param($line)
+    $sensitive = @('password', 'secret', 'token', 'apikey', 'connectionstring')
+    $hasSensitive = $sensitive | Where-Object { $line -match $_ }
+    return ($null -eq $hasSensitive)
+}
+
+#==================================================================================================
 # Pre-Initialization
 #==================================================================================================
 if (-not (Test-Path $Script:BasePath)) {
