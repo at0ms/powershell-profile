@@ -1,5 +1,11 @@
 # PowerShell Profile Release Notes
 
+### 1.0.3 - March 17th, 2026
+- Added welcome message for inital run
+- Added argument completion for 'profile'
+- Added prevent sensitive information from writing to command history
+- Small code refactor
+
 ### 1.0.2 - March 16th, 2026
 - Added 'edit' command
 - Added config edit function to cli
