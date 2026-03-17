@@ -340,6 +340,7 @@ if (-not (Test-Path $Script:BasePath)) {
 $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath -Default @{
     ClearConsoleOnInitialization = $true
     ConsoleUseUTF8 = $true
+    IsInitialRun = $true
     Editor = ""
     EditorOverride = $false
     Customization = @{
@@ -393,4 +394,17 @@ if($Script:Config.Customization.OhMyPosh)
             oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
         }
     }
+}
+
+if($Script:Config.IsInitialRun)
+{
+    Write-Host ""
+    Write-Host "Profile initialized for the first time."
+    Write-Host "Run" -NoNewLine;
+    Write-Host " `profile` " -ForegroundColor Blue -NoNewLine;
+    Write-Host "to view available commands and tools."
+    Write-Host ""
+
+    $Script:Config.IsInitialRun = $false
+    Save-JsonConfig -Path $Script:ConfigFilePath -Data $Script:Config
 }
