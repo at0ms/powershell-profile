@@ -8,24 +8,32 @@
 # Utility Functions
 #==================================================================================================
 function Save-JsonConfig {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [string]$Path,
 
         [Parameter(Mandatory)]
-        [hashtable]$Data
+        [object]$Data
     )
 
     $json = $Data | ConvertTo-Json -Depth 10
+
+    $directory = Split-Path $Path
+    if (-not (Test-Path $directory)) {
+        New-Item -ItemType Directory -Path $directory -Force | Out-Null
+    }
+
     Set-Content -Path $Path -Value $json -Encoding UTF8
 }
 
 function Load-JsonConfig {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [string]$Path,
 
-        [hashtable]$Default = @{}
+        [object]$Default = @{}
     )
 
     if (-not (Test-Path $Path)) {
@@ -33,8 +41,17 @@ function Load-JsonConfig {
         return $Default
     }
 
-    $raw = Get-Content -Path $Path -Raw
-    return ($raw | ConvertFrom-Json)
+    try {
+        $raw = Get-Content -Path $Path -Raw
+        $data = $raw | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        Write-Warning "Config file '$Path' is invalid JSON. Recreating with defaults."
+        Save-JsonConfig -Path $Path -Data $Default
+        return $Default
+    }
+
+    return $data
 }
 
 function Test-GitHubConnection {
@@ -276,6 +293,7 @@ Register-Command -Name "oh-my-posh" -Action {
     oh-my-posh @Args
 } -NativeAlias "omp" -Category "Shortcuts" -Description "Shortcut for oh-my-posh."
 
+# Utility
 Register-Command -Name "edit-file" -Action {
     param($fileName)
     & $Script:Editor $fileName
