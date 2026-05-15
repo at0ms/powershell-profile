@@ -96,6 +96,8 @@ function Get-ProfileDir {
 #==================================================================================================
 # Script Variables
 #==================================================================================================
+$Script:Version = "1.0.3"
+
 $Script:BasePath = Join-Path (Get-ProfileDir) "Profile"
 $Script:ConfigFilePath = Join-Path $Script:BasePath "config.json"
 $Script:Config = {}
@@ -126,16 +128,17 @@ function Invoke-ProfileCLI
     )
 
     if (-not $Args -or $Args.Count -eq 0) {
-        Write-Host " "
+        Write-Host " " # Spacer
         Write-Host "Profile CLI"
-        Write-Host " "
+        Write-Host " " # Spacer
         Write-Host "Usage:"
         Write-Host "  profile setup"
         Write-Host "  profile invoke <command>"
         Write-Host "  profile get-commands"
         Write-Host "  profile config-edit"
         Write-Host "  profile config-reload"
-        Write-Host " "
+        Write-Host "  profile about"
+        Write-Host " " # Spacer
         return
     }
 
@@ -170,13 +173,25 @@ function Invoke-ProfileCLI
         }
 
         "config-edit" {
-            Invoke-CommandByName edit $Script:ConfigFilePath
+            Invoke-CommandByName edit-file $Script:ConfigFilePath
         }
 
         "config-reload" {
             $Script:Config = Load-JsonConfig -Path $Script:ConfigFilePath
             Pick-FileEditor
             Write-Host "Reloaded config file." -ForegroundColor Green
+        }
+
+        "about" {
+            Write-Host " " # Spacer
+
+            Write-Host "Version: " -NoNewLine;
+            Write-Host $Script:Version -ForegroundColor Blue
+
+            Write-Host "Developer: " -NoNewLine;
+            Write-Host "at0ms" -ForegroundColor Blue
+
+            Write-Host " " # Spacer
         }
 
         default {
@@ -398,12 +413,12 @@ if($Script:Config.Customization.OhMyPosh)
 
 if($Script:Config.IsInitialRun)
 {
-    Write-Host ""
+    Write-Host " " # Spacer
     Write-Host "Profile initialized for the first time."
     Write-Host "Run" -NoNewLine;
     Write-Host " `profile` " -ForegroundColor Blue -NoNewLine;
     Write-Host "to view available commands and tools."
-    Write-Host ""
+    Write-Host " " # Spacer
 
     $Script:Config.IsInitialRun = $false
     Save-JsonConfig -Path $Script:ConfigFilePath -Data $Script:Config
