@@ -308,6 +308,12 @@ Register-Command -Name "oh-my-posh" -Action {
     oh-my-posh @Args
 } -NativeAlias "omp" -Category "Shortcuts" -Description "Shortcut for oh-my-posh."
 
+# History
+Register-Command -Name "clear-history" -Action {
+    Clear-Content (Get-PSReadlineOption).HistorySavePath
+    Write-Host "Cleared command history" -ForegroundColor "DarkGray"
+} -Category "History" -NativeAlias "clhis" -Description "Clear command history."
+
 # Utility
 Register-Command -Name "edit-file" -Action {
     param($fileName)
